@@ -3,6 +3,20 @@ import nodeAPI
 
 """
 > Aimed Interface:
+    nodeLib
+        create
+            server
+            node
+            cluster
+        activate
+            server --mode [local]
+            cluster
+        list
+            servers
+            nodes
+            clusters
+
+
     nodeLib create node --name fooNode
     nodeLib create cluster --name fooCluster
     nodeLib create server --name fooServer
@@ -37,4 +51,4 @@ parser_ActivateNode.add_argument('--name')
 args = parser.parse_args()
 
 # print(args.sum(args.integers))
-#print(args.create)
+# print(args.create)
