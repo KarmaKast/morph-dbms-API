@@ -6,11 +6,12 @@ import json
 import nodeAPI
 
 cwd = os.getcwd()
-config_data = {}
+config_data = None
 if 'cli_config.json' in os.listdir(cwd):
     path = os.path.join(cwd, 'cli_config.json')
     with open(path, 'r') as file:
         config_data = json.load(file)
+
 
 def update_config():
     path = os.path.join(cwd, 'cli_config.json')
@@ -32,9 +33,12 @@ def config():
 
 
 @click.command(name="set")
-@click.option('--env', default=os.path.join(cwd,'data'), nargs=1)
+@click.option('--env', default=os.path.join(cwd, 'data'), nargs=1)
 def config_set(**options):
     # set the 'env'
+    global config_data
+    if config_data == None:
+        config_data = {}
     config_data['env'] = options['env']
     click.echo(config_data)
     update_config()
@@ -44,7 +48,10 @@ def config_set(**options):
 @click.argument('mode', default='all', nargs=1)
 def config_list(mode):
     if mode == 'all':
-        click.echo(config_data)
+        if config_data != None:
+            click.echo(config_data)
+        else:
+            click.echo('cli_config.json not found at {}/'.format(cwd))
     else:
         click.echo("{}".format({mode: config_data[mode]}))
 
