@@ -1,0 +1,11 @@
+
+node_modules/
+
+nodeAPI/__pycache__/
+
+notes.txt
+.vscode/
+
+__pycache__/
+
+cli_config.json
