@@ -3,7 +3,7 @@ import os
 import click
 import json
 
-import nodeAPI
+import nodeLib
 
 cwd = os.getcwd()
 config_data = None
@@ -18,6 +18,8 @@ def update_config():
     with open(path, 'w') as file:
         json.dump(config_data, file)
 
+# active cluster
+
 
 @click.group()
 def nodeCli():
@@ -30,18 +32,20 @@ def config():
     pass
 
 # ---------------------------------------------------------------------------------
-
-
-@click.command(name="set")
-@click.option('--env', default=os.path.join(cwd, 'data'), nargs=1)
-def config_set(**options):
+@click.command(name="add")
+@click.option('--database', default=[os.path.join(cwd, 'data')], nargs=1, help="")
+def config_add(**options):
     # set the 'env'
+    # TODO check whether user given env path is valid full path or not
     global config_data
     if config_data == None:
         config_data = {}
-    config_data['env'] = options['env']
+    config_data['database'].append(options['database'])
     click.echo(config_data)
     update_config()
+
+
+config.add_command(config_add)
 
 
 @click.command(name="list")
@@ -55,8 +59,10 @@ def config_list(mode):
     else:
         click.echo("{}".format({mode: config_data[mode]}))
 
-# ---------------------------------------------------------------------------------
 
+config.add_command(config_list)
+# ---------------------------------------------------------------------------------
+nodeCli.add_command(config)
 # --------------------------------------------------------------------------------------------------------------
 
 
@@ -71,12 +77,38 @@ def create():
 @click.argument('name', nargs=1)
 def create_node(name):
     click.echo('TODO create node with name: {}'.format(name))
+    
+    if 'database' in config_data.keys():
+        click.echo(config_data['database'][0])
+        if not os.path.exists(config_data['database'][0]):
+            # create path
+            os.mkdir(config_data['database'][0])
+    else:
+        #update
+        pass
+    # create a node with give name
+    #nodeLib
+    # node_ID : ID -1 indicates orphan node. i.e not related to any other node
+    node_ = nodeLib.node.Node_Manager.create_node( node_ID={'ID':-1 , 'node_name':name})
+    nodeLib.files.write(node_, os.path.join(config_data['database'][0], '{}.node.yaml'.format(node_._hash)))
+    
 
 
 @click.command(name='cluster')
 @click.argument('name', nargs=1)
 def create_cluster(name):
     click.echo('TODO create cluster with name: {}'.format(name))
+    
+    if 'database' in config_data.keys():
+        click.echo(config_data['database'][0])
+        if not os.path.exists(config_data['database'][0]):
+            # create path
+            os.mkdir(config_data['database'][0])
+    else:
+        #update
+        pass
+    # create a cluster with give name
+    #nodeLib
 
 
 @click.command(name='server')
@@ -137,10 +169,6 @@ def list_server(name):
 
 # --------------------------------------------------------------------------------------------------------------
 
-
-nodeCli.add_command(config)
-config.add_command(config_set)
-config.add_command(config_list)
 
 nodeCli.add_command(create)
 create.add_command(create_node)
