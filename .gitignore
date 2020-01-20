@@ -9,3 +9,5 @@ notes.txt
 __pycache__/
 
 cli_config.json
+
+data/
