@@ -1,4 +1,4 @@
 [submodule "nodeLib"]
 	path = nodeLib
-	url = git@github.com:SreeChandan/nodeLib.git
+	url = git@github.com:KarmaKast/nodeLib.git
 	branch = develop
