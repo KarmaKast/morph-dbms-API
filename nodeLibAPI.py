@@ -25,7 +25,7 @@ class commons:
 
 class welcome(Resource):
     def get(self):
-        return({'msg': 'Welcome to nodeAPI.<br>For documentation refer <a href="WIP>nodeAPI repo</a>"'})
+        return({'msg': 'Welcome to nodeAPI.<br>For documentation refer <a href="WIP">nodeAPI repo</a>'})
 
     def post(self):
         return({'msg': ''})
