@@ -1,5 +1,7 @@
+import flask
 from flask import Flask
 from flask_restful import Resource, Api, request
+from flask_cors import CORS, cross_origin
 import os
 import json
 
@@ -7,6 +9,7 @@ import nodeLib
 import nodeViz
 
 app = Flask(__name__)
+cors = CORS(app)
 api = Api(app)
 
 path = os.path.join(os.getcwd(), 'data')
@@ -24,15 +27,16 @@ class commons:
 
 
 @app.route('/')
+# @cross_origin()
 def index():
-    # return({'msg': 'Welcome to nodeAPI for nodeViz.<br>For documentation refer <a href="WIP">nodeAPI repo</a>'})
-    return('Welcome to nodeAPI for nodeViz.<br>For documentation refer <a href="WIP">nodeAPI repo</a>')
+    # return({'msg': 'Welcome to nodeAPI for nodeViz.<br/>For documentation refer <a href="WIP">nodeAPI repo</a>'})
+    return('Welcome to nodeAPI for nodeViz.<br/>For documentation refer <a href="WIP">nodeAPI repo</a>')
 
 
 class create_node(Resource):
     def post(self, name):
-        viz_instance1.create_node(name)
-        return ({'msg': "node '%s' is created" % (name)})
+        node_ID = viz_instance1.create_node(name)
+        return ({'ID': node_ID})
 
 
 api.add_resource(create_node, '/create/node/<name>')
@@ -40,8 +44,9 @@ api.add_resource(create_node, '/create/node/<name>')
 
 class save_state(Resource):
     def post(self):
-        commons.write_clusters(
-            [viz_instance1.source_cluster, viz_instance1.viz_cluster])
+        viz_instance1.save_database(path, commons.database_name)
+        """commons.write_clusters(
+            [viz_instance1.source_cluster, viz_instance1.viz_cluster])"""
         return ({'msg': "done"})
 
 
@@ -78,7 +83,7 @@ class describe1:
     def out(self):
         out_msg = ''
         for msg in self.msgs:
-            out_msg = out_msg+str(msg)+'<br>'
+            out_msg = out_msg+str(msg)+'<br/>'
         return out_msg
 
 
@@ -92,7 +97,7 @@ class describe(Resource):
         print(d2.msgs)
         nodeLib.cluster.describe(
             viz_instance1.viz_cluster, describer_=d2._describer)
-        return ("%s <br><br> %s" % (d1.out(), d2.out()))
+        return ("%s <br/><br/> %s" % (d1.out(), d2.out()))
 
 
 api.add_resource(describe, '/describe')
@@ -113,6 +118,16 @@ class update_prop(Resource):
 
 
 api.add_resource(update_prop, '/updateProps/<ID>')
+
+
+class get_nodes(Resource):
+    def get(self, cluster_ID=None):
+        node_IDs = list(viz_instance1.viz_cluster.nodes.keys())
+        print('sending node ID list', node_IDs)
+        return ({'IDs': node_IDs})
+
+
+api.add_resource(get_nodes, '/get/nodeIDs')
 
 
 class clear_database(Resource):
