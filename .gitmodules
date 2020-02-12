@@ -1,3 +1,8 @@
-[submodule "nodeAPI/nodeLib"]
-	path = nodeAPI/nodeLib
-	url = git@github.com:SreeChandan/nodeLib.git
+[submodule "nodeLib"]
+	path = nodeLib
+	url = git@github.com:KarmaKast/nodeLib.git
+	branch = develop
+[submodule "nodeViz"]
+	path = nodeViz
+	url = git@github.com:KarmaKast/nodeViz.git
+	branch = develop
