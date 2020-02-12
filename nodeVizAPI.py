@@ -1,9 +1,12 @@
 import flask
 from flask import Flask
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, Api, request, 
+#from flask_restful import reqparse
 from flask_cors import CORS, cross_origin
 import os
 import json
+
+#import urllib
 
 import nodeLib
 import nodeViz
@@ -32,6 +35,8 @@ def index():
     # return({'msg': 'Welcome to nodeAPI for nodeViz.<br/>For documentation refer <a href="WIP">nodeAPI repo</a>'})
     return('Welcome to nodeAPI for nodeViz.<br/>For documentation refer <a href="WIP">nodeAPI repo</a>')
 
+# doing: node/cluster commands
+
 
 class create_node(Resource):
     def post(self, name):
@@ -39,7 +44,44 @@ class create_node(Resource):
         return ({'ID': node_ID})
 
 
-api.add_resource(create_node, '/create/node/<name>')
+api.add_resource(create_node, '/node/create/<name>')
+
+
+class get_node_viz_data(Resource):
+    def get(self, node_ID):
+        node_data = viz_instance1.get_node_data(node_ID)
+        print('sending node data: ', node_data)
+        return ({'node_viz_data': node_data})
+
+
+api.add_resource(get_node_viz_data, '/node/get-data/<node_ID>')
+
+    
+class update_prop(Resource):
+    def post(self, ID):
+        # parameters either are not being sent properly or not received properly
+        print(request)
+        location = request.args.get('location')
+        print(request.args)
+        parseTuple = lambda text: [int(value) for value in text.strip(')(').split(',')] 
+        if location!=None:
+            viz_instance1.change_property(ID, 'location', parseTuple(location))
+        return ({'msg': ''})
+
+
+api.add_resource(update_prop, '/updateProps/<ID>')
+
+
+class get_nodes(Resource):
+    def get(self, cluster_ID=None):
+        node_IDs = list(viz_instance1.source_cluster.nodes.keys())
+        print('sending node ID list', node_IDs)
+        return ({'IDs': node_IDs})
+
+
+api.add_resource(get_nodes, '/get/nodeIDs')
+
+# doing: database commands
 
 
 class save_state(Resource):
@@ -92,42 +134,15 @@ class describe(Resource):
         d1 = describe1()
         nodeLib.cluster.describe(
             viz_instance1.source_cluster, describer_=d1._describer)
-        print(d1.msgs)
+        # print(d1.msgs)
         d2 = describe1()
-        print(d2.msgs)
+        # print(d2.msgs)
         nodeLib.cluster.describe(
             viz_instance1.viz_cluster, describer_=d2._describer)
         return ("%s <br/><br/> %s" % (d1.out(), d2.out()))
 
 
 api.add_resource(describe, '/describe')
-
-
-class update_prop(Resource):
-    def post(self, ID):
-        args = request.args
-        print(args)
-        for prop in args.keys():
-            values = args[prop]
-            # context: its better to convert this string to list at the receiving end
-            if prop in ['location', 'color']:
-                values = values.strip(')(').split(',')
-                values = [int(value) for value in values]
-            viz_instance1.change_property(ID, prop, values)
-        return ({'msg': ''})
-
-
-api.add_resource(update_prop, '/updateProps/<ID>')
-
-
-class get_nodes(Resource):
-    def get(self, cluster_ID=None):
-        node_IDs = list(viz_instance1.viz_cluster.nodes.keys())
-        print('sending node ID list', node_IDs)
-        return ({'IDs': node_IDs})
-
-
-api.add_resource(get_nodes, '/get/nodeIDs')
 
 
 class clear_database(Resource):
