@@ -1,7 +1,7 @@
 import flask
 from flask import Flask
-from flask_restful import Resource, Api, request, 
-#from flask_restful import reqparse
+from flask_restful import Resource, Api, request
+# from flask_restful import reqparse
 from flask_cors import CORS, cross_origin
 import os
 import json
@@ -56,20 +56,42 @@ class get_node_viz_data(Resource):
 
 api.add_resource(get_node_viz_data, '/node/get-data/<node_ID>')
 
-    
-class update_prop(Resource):
+
+class update_viz_prop(Resource):
     def post(self, ID):
         # parameters either are not being sent properly or not received properly
-        print(request)
+        # print(request)
         location = request.args.get('location')
-        print(request.args)
-        parseTuple = lambda text: [int(value) for value in text.strip(')(').split(',')] 
-        if location!=None:
+        color = request.args.get('color')
+        # print(request.args)
+        def parseTuple(text): return [int(value)
+                                      for value in text.strip(')(').split(',')]
+        if location != None:
             viz_instance1.change_property(ID, 'location', parseTuple(location))
+        if color != None:
+            print('recieved color ', color)
+            viz_instance1.change_property(ID, 'color', parseTuple(color))
         return ({'msg': ''})
 
 
-api.add_resource(update_prop, '/updateProps/<ID>')
+api.add_resource(update_viz_prop, '/updateProps/<ID>')
+
+
+class update_node_source(Resource):
+    def post(self, ID):
+        # parameters either are not being sent properly or not received properly
+        # print(request)
+        label = request.args.get('label')
+        # print(request.args)
+
+        #parseTuple = lambda text: [int(value) for value in text.strip(')(').split(',')]
+
+        if label != None:
+            viz_instance1.change_source(ID, 'label', label)
+        return ({'msg': ''})
+
+
+api.add_resource(update_node_source, '/updateSource/<ID>')
 
 
 class get_nodes(Resource):
