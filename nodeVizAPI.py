@@ -39,8 +39,9 @@ def index():
 
 
 class create_node(Resource):
-    def post(self, name):
+    def post(self, name=""):
         node_ID = viz_instance1.create_node(name)
+        print('create node called')
         return ({'ID': node_ID})
 
 
