@@ -12,7 +12,8 @@
     "tsBuild": "tsc --outDir ./lib",
     "tsBuild:sourceMap": "tsc --sourceMap --outDir ./lib",
     "build": "rm -r -f ./lib && npm run lint && npm run tsBuild",
-    "lint": "./node_modules/.bin/eslint --fix 'src/**/*.ts'"
+    "lint": "./node_modules/.bin/eslint --fix 'src/**/*.ts'",
+    "serve": "node ./lib/index.js"
   },
   "publishConfig": {
     "access": "public"
@@ -28,8 +29,8 @@
   },
   "homepage": "https://github.com/KarmaKast/morph-dbms-api#readme",
   "devDependencies": {
-    "@types/express": "^4.17.4",
-    "@types/node": "^13.11.0",
+    "@types/express": "^4.17.6",
+    "@types/node": "^13.11.1",
     "@types/uuid": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
@@ -45,6 +46,7 @@
     "@karmakast/morph-dbms-core": "^0.2.1",
     "@karmakast/morph-dbms-viz": "0.0.3",
     "express": "^4.17.1",
+    "kill-port": "^1.6.0",
     "uuid": "^7.0.3"
   }
 }
