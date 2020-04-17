@@ -1,6 +1,6 @@
 {
   "name": "@karmakast/morph-dbms-api",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "a visualization wrapper for morph-dbms-core",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -44,11 +44,12 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@karmakast/morph-dbms-core": "^0.2.1",
-    "@karmakast/morph-dbms-viz": "0.0.3",
+    "@karmakast/morph-dbms-core": "^0.3.0",
+    "@karmakast/morph-dbms-viz": "^0.1.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "kill-port": "^1.6.0",
+    "pkg-packager": "0.0.1",
     "uuid": "^7.0.3"
   }
 }
