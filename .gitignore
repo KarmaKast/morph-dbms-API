@@ -1,16 +1,12 @@
-
 node_modules/
 
-nodeAPI/__pycache__/
+test.js
+lib/
 
-notes.txt
+data2/
+
 .vscode/
 
-__pycache__/
-
-cli_config.json
+notes/
 
 data/
-
-notes/
-conda-dependies.txt
