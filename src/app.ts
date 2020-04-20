@@ -108,6 +108,46 @@ app.get("/entity/get", function (req, res) {
   } else res.status(404).send("collection hasn't been loaded yet");
 });
 
+function cleanUnusedEmptyRel(): void {
+  //
+}
+
+app.post("/entity/addRelClaim", function (req, res) {
+  console.log(req.body);
+  if (vizSession) {
+    const claimantID: string | undefined = req.body.claimantID as
+      | string
+      | undefined;
+    const targetID: string | undefined = req.body.targetID as
+      | string
+      | undefined;
+
+    if (claimantID && targetID) {
+      const tempRel = morphCore.createRelation("");
+      vizSession.sourceCollection.Relations.set(tempRel.ID, tempRel);
+      const claimant = vizSession.sourceCollection.Entities.get(claimantID);
+      const target = vizSession.sourceCollection.Entities.get(targetID);
+      if (claimant && target) {
+        morphCore.Entity.claimRelation(
+          tempRel,
+          morphCore.Direction.SelfToTarget,
+          claimant,
+          target
+        );
+        res.send({
+          msg: "success",
+          relClaim: JSON.stringify({
+            Direction: morphCore.Direction.SelfToTarget,
+            To: target.ID,
+            Relation: tempRel.ID,
+          } as morphCore.Structs.RelationClaimDense),
+        });
+      }
+      //morphCore.Collection.describe(vizSession.sourceCollection);
+    }
+  } else res.status(404).send("collection hasn't been loaded yet");
+});
+
 app.post("/entity/updateLabel", function (req, res) {
   if (vizSession) {
     console.log(req.query, req.body);
