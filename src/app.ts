@@ -69,7 +69,21 @@ app.post("/entity/create", function (req, res) {
       res.send({
         entityID: vizSession.createEntity(),
       });
-  } else res.status(404).send("collection hasn't been loaded yet or no entityID provided or entity with ID does not exist");
+  } else res.status(404).send("collection hasn't been loaded yet");
+});
+
+app.post("/entity/remove", function (req, res) {
+  console.log(req.body);
+  if (vizSession) {
+    const entityID: string | undefined = req.query.entityID as
+      | string
+      | undefined;
+    if (entityID) vizSession.removeEntity(entityID);
+    //console.log(vizPropsString, JSON.parse(vizPropsString));
+    res.send({
+      msg: "success",
+    });
+  } else res.status(404).send("collection hasn't been loaded yet");
 });
 
 app.get("/entity/get", function (req, res) {
