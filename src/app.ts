@@ -20,7 +20,7 @@ app.all("/", function (_request: Request, response: Response) {
 
 let vizSession: morphViz.Viz;
 app.post("/collection/create", function (req, res) {
-  const label = req.body.label;
+  const label = req.body.Label;
   console.log("label : ", label);
 
   vizSession = new morphViz.Viz(label);
@@ -53,7 +53,7 @@ app.get("/collection/get", function (req, res) {
     res.send(
       morphCore.Collection.condenseCollection(vizSession.sourceCollection)
     );
-  } else res.status(404).send("collection hasn't been loaded yet");
+  } else res.status(400).send("collection hasn't been loaded yet");
 });
 
 app.post("/entity/create", function (req, res) {
@@ -75,14 +75,22 @@ app.post("/entity/create", function (req, res) {
 app.post("/entity/remove", function (req, res) {
   console.log(req.body);
   if (vizSession) {
-    const entityID: string | undefined = req.query.entityID as
+    const entityID: string | undefined = req.body.entityID as
       | string
       | undefined;
-    if (entityID) vizSession.removeEntity(entityID);
+    let result;
+
+    if (entityID) {
+      //morphCore.Collection.describe(vizSession.sourceCollection);
+      result = vizSession.removeEntity(entityID);
+      //morphCore.Collection.describe(vizSession.sourceCollection);
+      res.send({
+        msg: "success",
+        claimantIDs: result,
+      });
+    }
+
     //console.log(vizPropsString, JSON.parse(vizPropsString));
-    res.send({
-      msg: "success",
-    });
   } else res.status(404).send("collection hasn't been loaded yet");
 });
 
