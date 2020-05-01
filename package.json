@@ -1,6 +1,6 @@
 {
   "name": "@karmakast/morph-dbms-api",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "a visualization wrapper for morph-dbms-core",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -13,7 +13,9 @@
     "tsBuild:sourceMap": "tsc --sourceMap --outDir ./lib",
     "build": "rm -r -f ./lib && npm run lint && npm run tsBuild",
     "lint": "./node_modules/.bin/eslint --fix 'src/**/*.ts'",
-    "serve": "node ./lib/index.js"
+    "serve": "node ./lib/index.js",
+    "versionBump:minor": "npm version minor --no-git-tag-version --force",
+    "versionBump:patch": "npm version patch --no-git-tag-version --force"
   },
   "publishConfig": {
     "access": "public"
