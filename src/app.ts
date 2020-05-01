@@ -44,12 +44,15 @@ app.post("/collection/load", function (req, res) {
     req.body.collectionID,
     req.body.Label
   );
+  morphCore.Collection.describe(vizSession.sourceCollection);
   //console.log(vizSession);
   res.send("Success");
 });
 
 app.get("/collection/get", function (req, res) {
   if (vizSession) {
+    morphCore.Collection.describe(vizSession.sourceCollection);
+    morphCore.Collection.describe(vizSession.vizCollection);
     res.send(
       morphCore.Collection.condenseCollection(vizSession.sourceCollection)
     );
@@ -104,12 +107,13 @@ app.get("/entity/get", function (req, res) {
     const sourceEntity = entityID
       ? vizSession.sourceCollection.Entities.get(entityID)
       : undefined;
-    if (entityID && sourceEntity)
+    if (entityID && sourceEntity) {
+      morphCore.Entity.describe(sourceEntity);
       res.send([
         morphCore.Entity.condenseEntity(sourceEntity),
         morphCore.Entity.condenseEntity(vizSession.getVizEntity(entityID)),
       ]);
-    else
+    } else
       res
         .status(404)
         .send("no entityID provided or entity with ID does not exist");
@@ -182,11 +186,15 @@ app.post("/entity/updateProps", function (req, res) {
       | string
       | undefined;
     const vizEntity = entityID ? vizSession.getVizEntity(entityID) : undefined;
-    const body = JSON.parse(req.body.props);
-    console.log(body);
+    const props = JSON.parse(req.body.props);
+    console.log(props);
     if (entityID && vizEntity) {
-      Object.keys(body).forEach((key) => {
-        if (vizEntity.Data) vizEntity.Data.set(key, body[key]);
+      Object.keys(props).forEach((key) => {
+        if (vizEntity.Data) {
+          console.log("before : ", vizEntity.Data);
+          vizEntity.Data.set(key, props[key]);
+          console.log("after : ", vizEntity.Data);
+        }
       });
       res.send("success");
     } else
