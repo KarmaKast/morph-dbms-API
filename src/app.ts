@@ -20,7 +20,7 @@ app.all("/", function (_request: Request, response: Response) {
 
 let vizSession: morphViz.Viz;
 app.post("/collection/create", function (req, res) {
-  const label = req.body.label;
+  const label = req.body.Label;
   console.log("label : ", label);
 
   vizSession = new morphViz.Viz(label);
@@ -44,16 +44,19 @@ app.post("/collection/load", function (req, res) {
     req.body.collectionID,
     req.body.Label
   );
+  morphCore.Collection.describe(vizSession.sourceCollection);
   //console.log(vizSession);
   res.send("Success");
 });
 
 app.get("/collection/get", function (req, res) {
   if (vizSession) {
+    morphCore.Collection.describe(vizSession.sourceCollection);
+    morphCore.Collection.describe(vizSession.vizCollection);
     res.send(
       morphCore.Collection.condenseCollection(vizSession.sourceCollection)
     );
-  } else res.status(404).send("collection hasn't been loaded yet");
+  } else res.status(400).send("collection hasn't been loaded yet");
 });
 
 app.post("/entity/create", function (req, res) {
@@ -69,7 +72,29 @@ app.post("/entity/create", function (req, res) {
       res.send({
         entityID: vizSession.createEntity(),
       });
-  } else res.status(404).send("collection hasn't been loaded yet or no entityID provided or entity with ID does not exist");
+  } else res.status(404).send("collection hasn't been loaded yet");
+});
+
+app.post("/entity/remove", function (req, res) {
+  console.log(req.body);
+  if (vizSession) {
+    const entityID: string | undefined = req.body.entityID as
+      | string
+      | undefined;
+    let result;
+
+    if (entityID) {
+      //morphCore.Collection.describe(vizSession.sourceCollection);
+      result = vizSession.removeEntity(entityID);
+      //morphCore.Collection.describe(vizSession.sourceCollection);
+      res.send({
+        msg: "success",
+        claimantIDs: result,
+      });
+    }
+
+    //console.log(vizPropsString, JSON.parse(vizPropsString));
+  } else res.status(404).send("collection hasn't been loaded yet");
 });
 
 app.get("/entity/get", function (req, res) {
@@ -82,15 +107,56 @@ app.get("/entity/get", function (req, res) {
     const sourceEntity = entityID
       ? vizSession.sourceCollection.Entities.get(entityID)
       : undefined;
-    if (entityID && sourceEntity)
+    if (entityID && sourceEntity) {
+      morphCore.Entity.describe(sourceEntity);
       res.send([
         morphCore.Entity.condenseEntity(sourceEntity),
         morphCore.Entity.condenseEntity(vizSession.getVizEntity(entityID)),
       ]);
-    else
+    } else
       res
         .status(404)
         .send("no entityID provided or entity with ID does not exist");
+  } else res.status(404).send("collection hasn't been loaded yet");
+});
+
+function cleanUnusedEmptyRel(): void {
+  //
+}
+
+app.post("/entity/addRelClaim", function (req, res) {
+  console.log(req.body);
+  if (vizSession) {
+    const claimantID: string | undefined = req.body.claimantID as
+      | string
+      | undefined;
+    const targetID: string | undefined = req.body.targetID as
+      | string
+      | undefined;
+
+    if (claimantID && targetID) {
+      const tempRel = morphCore.createRelation("");
+      vizSession.sourceCollection.Relations.set(tempRel.ID, tempRel);
+      const claimant = vizSession.sourceCollection.Entities.get(claimantID);
+      const target = vizSession.sourceCollection.Entities.get(targetID);
+      if (claimant && target) {
+        morphCore.Entity.claimRelation(
+          tempRel,
+          morphCore.Direction.SelfToTarget,
+          claimant,
+          target
+        );
+        res.send({
+          msg: "success",
+          relClaim: JSON.stringify({
+            Direction: morphCore.Direction.SelfToTarget,
+            To: target.ID,
+            Relation: tempRel.ID,
+          } as morphCore.Structs.RelationClaimDense),
+        });
+      }
+      //morphCore.Collection.describe(vizSession.sourceCollection);
+    }
   } else res.status(404).send("collection hasn't been loaded yet");
 });
 
@@ -120,11 +186,15 @@ app.post("/entity/updateProps", function (req, res) {
       | string
       | undefined;
     const vizEntity = entityID ? vizSession.getVizEntity(entityID) : undefined;
-    const body = JSON.parse(req.body.props);
-    console.log(body);
+    const props = JSON.parse(req.body.props);
+    console.log(props);
     if (entityID && vizEntity) {
-      Object.keys(body).forEach((key) => {
-        if (vizEntity.Data) vizEntity.Data.set(key, body[key]);
+      Object.keys(props).forEach((key) => {
+        if (vizEntity.Data) {
+          console.log("before : ", vizEntity.Data);
+          vizEntity.Data.set(key, props[key]);
+          console.log("after : ", vizEntity.Data);
+        }
       });
       res.send("success");
     } else
