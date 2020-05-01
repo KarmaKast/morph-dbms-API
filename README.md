@@ -6,6 +6,7 @@
 - rum following commands in order at the cloned dir
 
 ``` bash
+mkdir data
 npm install
 npm run build
 npm run serve
