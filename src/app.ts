@@ -51,11 +51,45 @@ app.post("/collection/load", function (req, res) {
 
 app.get("/collection/get", function (req, res) {
   if (vizSession) {
-    morphCore.Collection.describe(vizSession.sourceCollection);
-    morphCore.Collection.describe(vizSession.vizCollection);
-    res.send(
-      morphCore.Collection.condenseCollection(vizSession.sourceCollection)
+    //morphCore.Collection.describe(vizSession.sourceCollection);
+    //morphCore.Collection.describe(vizSession.vizCollection);
+    const temp: any = morphCore.Collection.condenseCollection(
+      vizSession.sourceCollection
     );
+    temp.Relations = {};
+    vizSession.sourceCollection.Relations.forEach((value, key) => {
+      //
+      temp.Relations[value.ID] = value.Label;
+    });
+    //console.log(temp);
+    res.send(temp);
+  } else res.status(400).send("collection hasn't been loaded yet");
+});
+
+app.get("/collection/getRelation", function (req, res) {
+  if (vizSession) {
+    //morphCore.Collection.describe(vizSession.sourceCollection);
+    //morphCore.Collection.describe(vizSession.vizCollection);
+    res.send(vizSession.sourceCollection.Relations.get(req.body.relationID));
+  } else res.status(400).send("collection hasn't been loaded yet");
+});
+
+app.post("/collection/updateRelation", function (req, res) {
+  if (vizSession) {
+    console.log("updateRelation: ", req.query, req.body);
+    const relationID = req.query.relationID as
+      | morphCore.Structs.Relation["ID"]
+      | undefined;
+    const relationLabel = req.body
+      .relationLabel as morphCore.Structs.Relation["Label"];
+    if (relationID) {
+      const relation = {
+        ID: relationID,
+        Label: relationLabel,
+      };
+      vizSession.sourceCollection.Relations.set(relationID, relation);
+    }
+    res.send("success");
   } else res.status(400).send("collection hasn't been loaded yet");
 });
 
@@ -108,7 +142,7 @@ app.get("/entity/get", function (req, res) {
       ? vizSession.sourceCollection.Entities.get(entityID)
       : undefined;
     if (entityID && sourceEntity) {
-      morphCore.Entity.describe(sourceEntity);
+      //morphCore.Entity.describe(sourceEntity);
       res.send([
         morphCore.Entity.condenseEntity(sourceEntity),
         morphCore.Entity.condenseEntity(vizSession.getVizEntity(entityID)),
