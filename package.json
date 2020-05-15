@@ -1,6 +1,6 @@
 {
   "name": "@karmakast/morph-dbms-api",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "a visualization wrapper for morph-dbms-core",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
