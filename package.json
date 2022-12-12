@@ -49,7 +49,7 @@
     "@karmakast/morph-dbms-core": "^0.3.1",
     "@karmakast/morph-dbms-viz": "^0.1.1",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "kill-port": "^1.6.0",
     "pkg-packager": "0.0.1",
     "uuid": "^7.0.3"
